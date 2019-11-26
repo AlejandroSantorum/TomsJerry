@@ -64,6 +64,9 @@ class Game(models.Model):
     cat_turn = models.BooleanField(default=True)
     # Game status
     status = models.IntegerField(default=GameStatus.CREATED)
+    # Game winner (if any)
+    winner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True,
+                                   null=True, related_name="game_winner")
 
     # Game moves
     @property
@@ -109,10 +112,37 @@ class Game(models.Model):
             raise ValidationError(MSG_ERROR_INVALID_CELL)
         if not self.__pos_is_valid(self.mouse):
             raise ValidationError(MSG_ERROR_INVALID_CELL)
+
+        if self.__game_end():
+            self.status = GameStatus.FINISHED
         super(Game, self).save(*args, **kwargs)
+
+    def __game_end(self):
+        cats = self._get_cat_places()
+        cats = [tuple(self.__pos_to_list(c)) for c in cats]
+        min_cat = min(cats)
+        mouse = self.__pos_to_list(self.mouse)
+        if mouse[0] <= min_cat[0]:
+            self.winner = self.mouse_user
+            return True
+        SE_lst = tuple([x+1 for x in mouse])
+        SW_lst = tuple([mouse[0]+1, mouse[1]-1])
+        NW_lst = tuple([x-1 for x in mouse])
+        NE_lst = tuple([mouse[0]-1, mouse[1]+1])
+        possible_moves = set([SE_lst, SW_lst, NW_lst, NE_lst])
+        cats = set(cats)
+        possible_moves = possible_moves.difference(cats)
+        possible_moves = [move for move in possible_moves if (move[0] >= 1 and move[0] <= 8 and move[1] >= 1 and move[1] <= 8)]
+        if len(possible_moves) == 0:
+            self.winner = self.cat_user
+            return True
+        return False
 
     def _get_cat_places(self):
         return [self.cat1, self.cat2, self.cat3, self.cat4]
+
+    def __pos_to_list(self, position):
+        return [(position//Game.WIDTH) + 1, (position % Game.WIDTH) + 1]
 
     def __str__(self):
         id = str(self.id)
