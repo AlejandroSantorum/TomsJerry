@@ -18,42 +18,29 @@
     <title>{% block title %}PSI 2019-2020: Example of application{% endblock %}</title>
 </head>
 
-<body id="body">
-    <div id="totalheader">
-        <div id="title">
-            {% block atitle %}<h1>Mouse vs. Cats application</h1>{% endblock atitle %}
-        </div>
-
-        <div id="header">
-            {% if request.user.is_authenticated %}
-                Welcome <span class="username">{{ request.user.username }}</span>!
-            {% endif %}
-        </div>
+<body class="bg-dark d-flex flex-column">
+    <div class="row justify-content-center">
+        <div id="title" class="col-8 font-weight-bold display-1 text-center text-white">Toms & Jerry</div>
     </div>
 
-    <hr/>
+    <div id="content" class="container align-items-center d-flex flex-column flex-grow-1">
+        {% block content %}
+        {% endblock content %}
+    </div>
 
-    {% block content %}
-    {% endblock content %}
+    <footer class="page-footer font-small fixed-bottom bg-info">
+        <!-- Copyright -->
+        <div class="footer-copyright text-center py-2">© 2019 Copyright:
+            <a href="https://github.com/Lletfrix"> Rafael Sánchez </a>
+            &
+            <a href="https://github.com/AlejandroSantorum"> Alejandro Santorum</a>
+        </div>
+    </footer>
 
-    <hr/>
-
-    {% block footer %}
-        <!-- Footer -->
-        <footer class="page-footer font-small fixed-bottom bg-info">
-            <!-- Copyright -->
-            <div class="footer-copyright text-center py-3">© 2019 Copyright:
-                <a href="https://github.com/Lletfrix"> Rafael Sánchez </a>
-                &
-                <a href="https://github.com/AlejandroSantorum"> Alejandro Santorum</a>
-            </div>
-            <!-- Copyright -->
-
-        </footer>
-        <!-- Footer -->
-    {% endblock footer %}
+    <!-- Scripts for bootstrap -->
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/js/bootstrap.min.js" integrity="sha384-3qaqj0lc6sV/qpzrc1N5DC6i1VRn/HyX4qdPaiEFbn54VjQBEU341pvjz7Dv3n6P" crossorigin="anonymous"></script>
 </body>
+
 </html>

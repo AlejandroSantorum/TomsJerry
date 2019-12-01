@@ -1,17 +1,23 @@
 {% extends "mouse_cat/base.html" %}
 
 {% block content %}
-<div id="content">
-    <h1>Signup user</h1>
-    {% if user_form %}
-        <form id="user_form" method="post" action="{% url 'signup' %}">
-            {% csrf_token %}
-            {{ user_form.as_p }}<br/>
-            <input type="submit" name="submit" value="Register" />
-        </form>
-    {% else %}
-        <p>User successfully created</p>
-    {% endif %}
-    <p><a href="{% url 'landing' %}">Return to homepage</a></p>
-</div>
+
+
+<form id="user_form" method="post" action="{% url 'signup' %}" class="align-items-center mt-4 d-flex flex-column bg-white form-rounded col-10 col-md-8 shadow p-5">
+    {% csrf_token %}
+    {% for field in user_form.visible_fields %}
+    <div class="row w-100 my-3">
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+            <span class="font-weight-bold">
+            {{ field.label }}
+            </span>
+        </div>
+        <div class="col-4 col-sm-6 col-md-7 col-lg-8">
+             {{ field }}
+        </div>
+    </div>
+    {% endfor %}
+    <input type="hidden" name="return_service" value="{{ return_service }}" />
+    <input type="submit" class="btn btn-info mt-4" value="Register" />
+</form>
 {% endblock content %}
