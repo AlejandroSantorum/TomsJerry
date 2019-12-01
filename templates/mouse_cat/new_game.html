@@ -1,9 +1,11 @@
-{% extends "mouse_cat/base.html" %}
+{% extends "mouse_cat/game_base.html" %}
 
 {% block content %}
-<div id="content">
-    <h1>Create game</h1>  
-    <p>Game <b>{{ game.id }}</b> succesfully created by user <b>{{ game.cat_user.username }}</b></p>
-    <p><a href="{% url 'landing' %}">Return to homepage</a></p>
-</div>
+<div class="flex-grow-1 d-flex flex-column"></div>
+    {% csrf_token %}
+    <span class="display-5 text-white pb-3">Game <b>{{ game.id }}</b> succesfully created by user <b>{{ game.cat_user.username }}</b></span>
+
+    <iframe allow="autoplay" allow="loop" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" width="75%" height="75%" type="text/html" src="https://www.youtube.com/embed/5COCkiq4374?autoplay=1&fs=0&iv_load_policy=3&showinfo=0&rel=0&cc_load_policy=0&start=0&end=0&loop=1&origin=https://youtubeembedcode.com&playlist=5COCkiq4374"></iframe>
+
+<div class="flex-grow-1"></div>
 {% endblock content %}
