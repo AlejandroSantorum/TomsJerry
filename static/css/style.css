@@ -22,3 +22,43 @@ body{
     border-color: #17a2b8;
     transition: border-color linear 0.3s;
 }
+
+.card-img{
+    object-fit: cover;
+    padding-top: 10%;
+}
+
+.card-text{
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vs-font{
+    font-size: 6vw;
+}
+
+.turn-font{
+    font-size: 1.8vw;
+}
+
+a {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+a:hover{
+    color: inherit;
+    text-decoration: inherit;
+}
+
+.game-card:hover {
+    background-color: #eee !important;
+}
+
+.side-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    border-left: 0 !important;
+}

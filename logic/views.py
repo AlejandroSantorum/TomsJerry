@@ -297,10 +297,11 @@ def join_game(request):
         context_dict = {constants.ERROR_MESSAGE_ID:
                         'There is no available games'}
         return render(request, "mouse_cat/join_game.html", context_dict)
-    game = pending_games[0]
-    game.mouse_user = request.user
-    game.save()
-    return render(request, "mouse_cat/join_game.html", {'game': game})
+    # game = pending_games[0]
+    # game.mouse_user = request.user
+    # game.save()
+    request.session['next'] = 'show_game'
+    return render(request, "mouse_cat/select_game.html", {'games': pending_games})
 
 
 @login_required

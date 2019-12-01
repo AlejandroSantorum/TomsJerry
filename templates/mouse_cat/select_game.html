@@ -1,34 +1,30 @@
-{% extends "mouse_cat/base.html" %}
+{% extends "mouse_cat/game_base.html" %}
 
 {% block content %}
-<div id="content">
-    <h1>Select game</h1>
-    <p>
-        {% if as_cat %}
-            Games as cat:
-            <ul>
-            {% for game in as_cat %}
-                <li> <a href="{% url 'select_game' game.id %}">{{ game }}</a></li>
-            {% endfor %}
-            </ul>
-        {%  else %}
-            No games as cat
-        {% endif %}
-    </p>
 
-    <p>
-        {% if as_mouse %}
-            Games as mouse:
-            <ul>
-            {% for game in as_mouse %}
-                <li> <a href="{% url 'select_game' game.id %}">{{ game }}</a></li>
-            {% endfor %}
-            </ul>
-        {%  else %}
-            No games as mouse
-        {% endif %}
-    </p>
-    
-    <p><a href="{% url 'landing' %}">Return to homepage</a></p>
+<span class="display-4 text-white font-weight-bold">Select a game</span>
+
+{% for g in games %}
+<div class="col-9" style="max-height: fit-content;">
+
+    <a href="{% url 'select_game' g.id %}" class="game-card bg-white form-rounded d-flex flex-row m-3 justify-content-center shadow">
+        <div class="col-3 d-flex flex-column justify-content-center align-items-center">
+            <img class="card-img" src="https://i.kym-cdn.com/photos/images/original/001/505/718/136.jpg" alt="">
+            <span class="text-center card-text"> {{g.cat_user}} </span>
+        </div>
+        <div class="col text-center d-flex flex-column justify-content-center align-items-center">
+            <span class="vs-font font-weight-bold"> VS </span>
+            {% if g.cat_turn %}
+            <span class="turn-font font-weight-bold"> {{g.cat_user}}'s turn </span>
+            {% else %}
+            <span class="turn-font font-weight-bold"> {{g.mouse_user}}'s turn </span>
+            {% endif %}
+        </div>
+        <div class="col-3 d-flex flex-column justify-content-center align-items-center">
+            <img class="card-img" src="https://i.kym-cdn.com/photos/images/original/001/505/718/136.jpg" alt="">
+            <span class="text-center card-text"> {{g.mouse_user}} </span>
+        </div>
+    </a>
 </div>
+{% endfor %}
 {% endblock content %}

@@ -21,7 +21,7 @@
 <body class="bg-dark d-flex flex-column">
     <div class="flex-grow-1 d-flex">
         <div class="row flex-grow-1">
-            <div class="col-2 d-flex flex-column align-items-center border border-top-0 border-info">
+            <div class="col-2 d-flex flex-column align-content-start border border-top-0 border-info side-menu">
                 <div class="flex-grow-1"></div>
                 <div class="row justify-content-center w-100">
                     <a class="col-10 btn btn-outline-info font-weight-bold" href="{% url 'logout' %}">Log Out</a>
@@ -44,7 +44,7 @@
                 </div>
                 <div class="flex-grow-1"></div>
             </div>
-            <div class="col-10 d-flex flex-column align-items-center">
+            <div class="col-10 d-flex flex-column align-items-center" style="margin-left: auto;">
                 {% block content %}
                 {% endblock content %}
             </div>
