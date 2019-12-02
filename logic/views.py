@@ -296,12 +296,72 @@ def join_game(request):
     if len(pending_games) == 0:
         context_dict = {constants.ERROR_MESSAGE_ID:
                         'There is no available games'}
-        return render(request, "mouse_cat/join_game.html", context_dict)
+        return render(request, "mouse_cat/join_game.html", context_dict) # TODO: Decidir que hacer
     # game = pending_games[0]
     # game.mouse_user = request.user
     # game.save()
-    request.session['next'] = 'show_game'
+    request.session['from'] = 'join_game'
     return render(request, "mouse_cat/select_game.html", {'games': pending_games})
+
+
+@login_required
+def play_game(request):
+    """
+    play_game (main author: Rafael Sanchez)
+    ----------
+    Input parameters:
+        request: received request. It contains logged user information.
+    ----------
+    Returns:
+        It renders "mouse_cat/join_game.html" template
+    ----------
+    Raises:
+        None
+    ----------
+    Description:
+        The selected game is activated and it's the player 1 turn.
+        It both cases the user is required to be logged.
+    """
+    my_games = Game.objects.filter(Q(cat_user=request.user) |
+                                   Q(mouse_user=request.user))
+    my_games = list(my_games.filter(status=GameStatus.ACTIVE))
+    if len(my_games) == 0:
+        context_dict = {constants.ERROR_MESSAGE_ID:
+                        'There is no available games'}
+        return render(request, "mouse_cat/join_game.html", context_dict) #TODO: decide
+
+    request.session['from'] = 'play_game'
+    return render(request, "mouse_cat/select_game.html", {'games': my_games})
+
+
+@login_required
+def replay_game(request):
+    """
+    play_game (main author: Rafael Sanchez)
+    ----------
+    Input parameters:
+        request: received request. It contains logged user information.
+    ----------
+    Returns:
+        It renders "mouse_cat/join_game.html" template
+    ----------
+    Raises:
+        None
+    ----------
+    Description:
+        The selected game is activated and it's the player 1 turn.
+        It both cases the user is required to be logged.
+    """
+    my_games = Game.objects.filter(Q(cat_user=request.user) |
+                                   Q(mouse_user=request.user))
+    my_games = list(my_games.filter(status=GameStatus.FINISHED))
+    if len(my_games) == 0:
+        context_dict = {constants.ERROR_MESSAGE_ID:
+                        'There is no available games'}
+        return render(request, "mouse_cat/join_game.html", context_dict) #TODO: decide
+
+    request.session['from'] = 'replay_game'
+    return render(request, "mouse_cat/select_game.html", {'games': my_games})
 
 
 @login_required
@@ -326,22 +386,18 @@ def select_game(request, game_id=None):
             It both cases the user is required to be logged.
     """
     if game_id:
-        my_games = Game.objects.filter(Q(cat_user=request.user) |
-                                       Q(mouse_user=request.user))
-        my_games = list(my_games.filter(status=GameStatus.ACTIVE))
-        my_games = [game.id for game in my_games]
-        if game_id in my_games:
-            request.session[constants.GAME_SELECTED_SESSION_ID] = int(game_id)
-            return redirect(reverse('show_game'))
-        else:
-            return HttpResponse('Selected game does not exist.', status=404)
-    # GET
-    as_cat = list(Game.objects.filter(cat_user=request.user,
-                                      status=GameStatus.ACTIVE))
-    as_mouse = list(Game.objects.filter(mouse_user=request.user,
-                                        status=GameStatus.ACTIVE))
-    context_dict = {'as_cat': as_cat, 'as_mouse': as_mouse}
-    return render(request, "mouse_cat/select_game.html", context_dict)
+        request.session[constants.GAME_SELECTED_SESSION_ID] = int(game_id)
+        next = request.session.get('next')
+        request.session.pop('next', None)
+        if request.session.get('from') == 'join_game':
+            game = Game.objects.filter(id=game_id, status=GameStatus.CREATED)
+            if len(game):
+                game = game[0]
+                game.mouse_user = request.user
+                game.save()
+                return redirect(reverse('show_game'))
+    else:
+        return HttpResponse('Selected game does not exist.', status=404)
 
 
 @login_required
@@ -367,13 +423,13 @@ def show_game(request):
             User is required to be logged.
     """
     if not request.session.get(constants.GAME_SELECTED_SESSION_ID):
-        return redirect(reverse('select_game'))
+        return redirect(reverse('index'))
 
     try:
         game_id = request.session.get(constants.GAME_SELECTED_SESSION_ID)
         game = Game.objects.get(id=game_id)
     except Game.DoesNotExist:
-        return redirect(reverse('select_game'))
+        return redirect(reverse('index'))
 
     board = [0]*constants.BOARD_SIZE
     board[game.mouse] = -1
