@@ -387,17 +387,24 @@ def select_game(request, game_id=None):
     """
     if game_id:
         request.session[constants.GAME_SELECTED_SESSION_ID] = int(game_id)
-        next = request.session.get('next')
-        request.session.pop('next', None)
-        if request.session.get('from') == 'join_game':
-            game = Game.objects.filter(id=game_id, status=GameStatus.CREATED)
-            if len(game):
-                game = game[0]
+        fromUrl = request.session.get('from')
+        if fromUrl == 'join_game':
+            status = GameStatus.CREATED
+        elif fromUrl == 'play_game':
+            status = GameStatus.ACTIVE
+        elif fromUrl == 'replay_game':
+            status = GameStatus.FINISHED
+        else:
+            return HttpResponse('Selected game does not exist.', status=404)
+        game = Game.objects.filter(id=game_id, status=status)
+        if len(game):
+            game = game[0]
+            if fromUrl == 'join_game':
                 game.mouse_user = request.user
                 game.save()
-                return redirect(reverse('show_game'))
-    else:
-        return HttpResponse('Selected game does not exist.', status=404)
+            return redirect(reverse('show_game'))
+
+    return HttpResponse('Selected game does not exist.', status=404)
 
 
 @login_required
