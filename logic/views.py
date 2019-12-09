@@ -480,6 +480,7 @@ def move(request):
     target = int(request.POST.get('target'))
     move_form = MoveForm(data=request.POST)
     move = Move(origin=origin, target=target, game=game, player=request.user)
+    print(move, game);
     try:
         move.save()
     except ValidationError as err:
