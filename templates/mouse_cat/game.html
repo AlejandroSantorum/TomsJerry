@@ -4,14 +4,7 @@
 {% block extra_js %}
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-
-{% if game.cat_user == request.user and game.cat_turn %}
-    <script src="{% static 'js/drag-drop-cat.js'%}"></script>
-{% elif game.mouse_user == request.user and not game.cat_turn %}
-    <script src="{% static 'js/drag-drop-mouse.js'%}"></script>
-{% endif %}
-
-
+<script src="{% static 'js/drag-drop.js'%}"></script>
 {% endblock extra_js%}
 
 {% block content %}
@@ -19,19 +12,23 @@
         {% csrf_token %}
         {{ move_form}}
     </form>
+    <div id="turn-info">
     {% if game.cat_turn %}
         {% if game.cat_user == request.user %}
-            <span class="display-4 text-white font-weight-bold">Your turn</span>
+            <div id="draggable">cat</div>
+            <span id="user-turn" class="display-4 text-white font-weight-bold">Your turn</span>
         {% else %}
-            <span class="display-4 text-white font-weight-bold">{{game.cat_user}}'s turn</span>
+            <span id="user-turn" class="display-4 text-white font-weight-bold">{{game.cat_user}}'s turn</span>
         {% endif %}
     {% else %}
         {% if game.mouse_user == request.user %}
-            <span class="display-4 text-white font-weight-bold">Your turn</span>
+            <div id="draggable">mouse</div>
+            <span id="user-turn" class="display-4 text-white font-weight-bold">Your turn</span>
         {% else %}
-            <span class="display-4 text-white font-weight-bold">{{game.mouse_user}}'s turn</span>
+            <span id="user-turn" class="display-4 text-white font-weight-bold">{{game.mouse_user}}'s turn</span>
         {% endif %}
     {% endif %}
+    </div>
     <div class="h-100">
             {% if board %}
                 <table id="chess_board">

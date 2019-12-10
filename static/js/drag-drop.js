@@ -1,6 +1,32 @@
 
 
 $( function() {
+    var reload_id;
+
+    function reload() {
+        console.log('reloading');
+        $('#chess_board').load('/mouse_cat/show_game #chess_board', function () {
+            $('#turn-info').load('/mouse_cat/show_game #turn-info', function () {
+                user = $('#draggable').html()
+                if (user) {
+                    console.log(user);
+                    $("[id^="+user+"-drag]").draggable(
+                            {
+                                revert: "invalid",
+                                start: calcDrop,
+                                stop: removeDrop
+                            }
+                        );
+                    clearTimeout(reload_id);
+                    console.log(reload_id+': Cleared');
+                } else {
+                    reload_id = setTimeout(reload, 1000);
+                    console.log(reload_id+': Setted');
+                }
+            });
+        });
+    };
+
     function targetPos(x, y, inc_x, inc_y) {
         tg_x = x + inc_x;
         tg_y = y + inc_y;
@@ -17,7 +43,9 @@ $( function() {
         target = $(this).attr('id').split('_')[1];
         ui.draggable.remove();
 
-        $("[id^=mouse-drag]").draggable(
+        user = $('#draggable').html()
+
+        $("[id^="+user+"-drag]").draggable(
                 {
                     revert: "invalid",
                     start: calcDrop,
@@ -36,7 +64,7 @@ $( function() {
                 'csrfmiddlewaretoken': csfrVal
                 },
             success: function () {
-                $('#content-div').load('/mouse_cat/show_game');
+                reload();
             }
             });
     }
@@ -78,13 +106,20 @@ $( function() {
         )
     }
 
-    // INITIALIZATIONS
 
-    $("[id^=mouse-drag]").draggable(
-            {
-                revert: "invalid",
-                start: calcDrop,
-                stop: removeDrop
-            }
-        );
+
+    // INITIALIZATIONS
+    user = $('#draggable').html()
+    if (user) {
+        console.log(user);
+        $("[id^="+user+"-drag]").draggable(
+                {
+                    revert: "invalid",
+                    start: calcDrop,
+                    stop: removeDrop
+                }
+            );
+    } else {
+        reload();
+    }
 });
