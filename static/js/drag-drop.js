@@ -1,12 +1,10 @@
-
-
 $( function() {
     var reload_id;
 
     function reload() {
         console.log('reloading');
-        $('#chess_board').load('/mouse_cat/show_game #chess_board', function () {
-            $('#turn-info').load('/mouse_cat/show_game #turn-info', function () {
+        $('#turn-info').load('/mouse_cat/show_game #turn-info', function () {
+            $('#chess_board').load('/mouse_cat/show_game #chess_board', function () {
                 user = $('#draggable').html()
                 if (user) {
                     console.log(user);
@@ -63,8 +61,18 @@ $( function() {
                 'target': target,
                 'csrfmiddlewaretoken': csfrVal
                 },
-            success: function () {
+            complete: function () {
                 reload();
+                console.log('EXECUTING GET');
+                $.ajax({
+                    type: 'GET',
+                    url: "/mouse_cat/game_status",
+                    success: function (result) {
+                        if (result.status == 2){
+                            alert(result.winner + ' won the game!');
+                        }
+                    }
+                });
             }
             });
     }

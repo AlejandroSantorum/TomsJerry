@@ -1,4 +1,4 @@
-from django.http import HttpResponseForbidden, HttpResponse
+from django.http import HttpResponseForbidden, HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -8,7 +8,7 @@ from logic.forms import UserForm, SignupForm, MoveForm
 from datamodel import constants
 from datamodel.models import Counter, Game, GameStatus, Move
 from django.db.models import Q
-
+import json
 
 def anonymous_required(f):
     """
@@ -402,6 +402,9 @@ def select_game(request, game_id=None):
             if fromUrl == 'join_game':
                 game.mouse_user = request.user
                 game.save()
+            if fromUrl == 'replay_game':
+                request.session['move_counter'] = -1
+
             return redirect(reverse('show_game'))
 
     return HttpResponse('Selected game does not exist.', status=404)
@@ -438,10 +441,16 @@ def show_game(request):
     except Game.DoesNotExist:
         return redirect(reverse('index'))
 
-    board = [0]*constants.BOARD_SIZE
-    board[game.mouse] = -1
-    for i in game._get_cat_places():
-        board[i] = 1
+    if request.session.get('from') == 'replay_game':
+        request.session['move_counter'] = -1
+        board = [0]*constants.BOARD_SIZE
+        board[0] = board[2] = board[4] = board[6] = 1
+        board[59] = -1
+    else:
+        board = [0]*constants.BOARD_SIZE
+        board[game.mouse] = -1
+        for i in game._get_cat_places():
+            board[i] = 1
     context_dict = {'board': board, 'game': game, 'move_form': MoveForm()}
     return render(request, "mouse_cat/game.html", context_dict)
 
@@ -492,3 +501,37 @@ def move(request):
         context_dict = {'board': board, 'game': game, 'move_form': move_form}
         return render(request, "mouse_cat/game.html", context_dict)
     return redirect(reverse('show_game'))
+
+# TODO: Document this
+
+def get_move(request):
+    if request.method == 'GET':
+        return HttpResponse('Invalid method.', status=404)
+    # POST
+    if not request.session.get(constants.GAME_SELECTED_SESSION_ID):
+        return HttpResponse('Invalid method.', status=404)
+    shift = int(request.POST.get('shift'))
+    game_id = request.session.get(constants.GAME_SELECTED_SESSION_ID)
+    game = Game.objects.get(id=game_id)
+    move_idx = int(request.session.get('move_counter'))
+
+    n_moves = len(game.moves)
+    if shift > 0:
+        move_idx += shift
+        move = game.moves[move_idx]
+        request.session['move_counter'] = move_idx
+        print(n_moves, move_idx)
+        resp = {'origin': move.origin, 'target': move.target, 'previous': True, 'next': move_idx < n_moves - 1}
+    else:
+        move = game.moves[move_idx]
+        move_idx += shift
+        request.session['move_counter'] = move_idx
+        resp = {'origin': move.target, 'target': move.origin, 'previous': move_idx >= 0, 'next': True}
+
+    return JsonResponse(resp, status=200)
+
+def game_status(request):
+    if request.session.get(constants.GAME_SELECTED_SESSION_ID):
+        game_id = request.session.get(constants.GAME_SELECTED_SESSION_ID)
+        game = Game.objects.get(id=game_id)
+        return  JsonResponse({'status': game.status, 'winner': game.winner.username}, status=200)

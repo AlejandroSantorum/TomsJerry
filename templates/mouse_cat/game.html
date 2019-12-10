@@ -4,7 +4,12 @@
 {% block extra_js %}
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<script src="{% static 'js/drag-drop.js'%}"></script>
+{% if request.session.from == 'replay_game' %}
+    <script src="{% static 'js/replay-game.js' %}"></script>
+{% else %}
+    <script src="{% static 'js/drag-drop.js'%}"></script>
+{% endif %}
+
 {% endblock extra_js%}
 
 {% block content %}
@@ -12,20 +17,31 @@
         {% csrf_token %}
         {{ move_form}}
     </form>
+
+
     <div id="turn-info">
-    {% if game.cat_turn %}
-        {% if game.cat_user == request.user %}
-            <div id="draggable">cat</div>
-            <span id="user-turn" class="display-4 text-white font-weight-bold">Your turn</span>
-        {% else %}
-            <span id="user-turn" class="display-4 text-white font-weight-bold">{{game.cat_user}}'s turn</span>
-        {% endif %}
+        <div id="game-finished" value="{{game.winner}}">{{game.status}}</div>
+    {% if request.session.from == 'replay_game' %}
+        <div class="flex-row d-flex mt-3 mb-3">
+            <button class="btn btn-light ml-2 mr-2" type="button" name="prev">⏪</button>
+            <button class="btn btn-light ml-2 mr-2" type="button" name="play-pause">▶️</button>
+            <button class="btn btn-light ml-2 mr-2" type="button" name="next">⏩️</button>
+        </div>
     {% else %}
-        {% if game.mouse_user == request.user %}
-            <div id="draggable">mouse</div>
-            <span id="user-turn" class="display-4 text-white font-weight-bold">Your turn</span>
+        {% if game.cat_turn %}
+            {% if game.cat_user == request.user %}
+                <div id="draggable">cat</div>
+                <span id="user-turn" class="display-4 text-white font-weight-bold">Your turn</span>
+            {% else %}
+                <span id="user-turn" class="display-4 text-white font-weight-bold">{{game.cat_user}}'s turn</span>
+            {% endif %}
         {% else %}
-            <span id="user-turn" class="display-4 text-white font-weight-bold">{{game.mouse_user}}'s turn</span>
+            {% if game.mouse_user == request.user %}
+                <div id="draggable">mouse</div>
+                <span id="user-turn" class="display-4 text-white font-weight-bold">Your turn</span>
+            {% else %}
+                <span id="user-turn" class="display-4 text-white font-weight-bold">{{game.mouse_user}}'s turn</span>
+            {% endif %}
         {% endif %}
     {% endif %}
     </div>
