@@ -26,19 +26,21 @@ body{
 .card-img{
     object-fit: cover;
     padding-top: 10%;
+    height: 80%;
 }
 
 .card-text{
     overflow: hidden;
     text-overflow: ellipsis;
+    font-size: 80%;
 }
 
 .vs-font{
-    font-size: 6vw;
+    font-size: 200%;
 }
 
 .turn-font{
-    font-size: 1.8vw;
+    font-size: 80%;
 }
 
 a {
@@ -49,6 +51,10 @@ a {
 a:hover{
     color: inherit;
     text-decoration: inherit;
+}
+
+.game-card {
+    height: 150px;
 }
 
 .game-card:hover {
@@ -85,4 +91,29 @@ tr:nth-of-type(2n) > td:nth-of-type(2n), tr:nth-of-type(2n+1) > td:nth-of-type(2
 
 #draggable {
     display: none;
+}
+
+.filter-card {
+    background-color: #f8f8f8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 4px;
+    padding: 4px 12px 4px 12px;
+    margin-top: 20px;
+    box-shadow:  0px 1px 3px 0px rgba(0, 0, 0, 0.2),
+    0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+    0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+    width: fit-content;
+}
+
+.filter-card > div {
+    display: flex;
+    width: 100%;
+    align-items: baseline;
+    justify-content: flex-start;
+}
+
+.filter-card > div > input {
+    margin-right: 4px;
 }

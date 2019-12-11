@@ -23,7 +23,7 @@
         <div id="game-finished" value="{{game.winner}}">{{game.status}}</div>
     {% if request.session.from == 'replay_game' %}
         <div class="flex-row d-flex mt-3 mb-3">
-            <button class="btn btn-light ml-2 mr-2" type="button" name="prev">⏪</button>
+            <button class="btn btn-light ml-2 mr-2" type="button" name="prev" disabled>⏪</button>
             <button class="btn btn-light ml-2 mr-2" type="button" name="play-pause">▶️</button>
             <button class="btn btn-light ml-2 mr-2" type="button" name="next">⏩️</button>
         </div>

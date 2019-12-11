@@ -297,11 +297,9 @@ def join_game(request):
         context_dict = {constants.ERROR_MESSAGE_ID:
                         'There is no available games'}
         return render(request, "mouse_cat/join_game.html", context_dict) # TODO: Decidir que hacer
-    # game = pending_games[0]
-    # game.mouse_user = request.user
-    # game.save()
+
     request.session['from'] = 'join_game'
-    return render(request, "mouse_cat/select_game.html", {'games': pending_games})
+    return render(request, "mouse_cat/select_game.html", {'games': pending_games, 'action': 'join_game'})
 
 
 @login_required
@@ -331,7 +329,7 @@ def play_game(request):
         return render(request, "mouse_cat/join_game.html", context_dict) #TODO: decide
 
     request.session['from'] = 'play_game'
-    return render(request, "mouse_cat/select_game.html", {'games': my_games})
+    return render(request, "mouse_cat/select_game.html", {'games': my_games, 'action': 'play_game'})
 
 
 @login_required
@@ -361,11 +359,11 @@ def replay_game(request):
         return render(request, "mouse_cat/join_game.html", context_dict) #TODO: decide
 
     request.session['from'] = 'replay_game'
-    return render(request, "mouse_cat/select_game.html", {'games': my_games})
+    return render(request, "mouse_cat/select_game.html", {'games': my_games, 'action': 'replay_game'})
 
 
 @login_required
-def select_game(request, game_id=None):
+def select_game(request, action, game_id=None):
     """
     select_game (main author: Alejandro Santorum)
     ----------
@@ -387,27 +385,34 @@ def select_game(request, game_id=None):
     """
     if game_id:
         request.session[constants.GAME_SELECTED_SESSION_ID] = int(game_id)
-        fromUrl = request.session.get('from')
-        if fromUrl == 'join_game':
+        if action == 'join_game':
             status = GameStatus.CREATED
-        elif fromUrl == 'play_game':
+        elif action == 'play_game':
             status = GameStatus.ACTIVE
-        elif fromUrl == 'replay_game':
+        elif action == 'replay_game':
             status = GameStatus.FINISHED
         else:
             return HttpResponse('Selected game does not exist.', status=404)
         game = Game.objects.filter(id=game_id, status=status)
         if len(game):
             game = game[0]
-            if fromUrl == 'join_game':
+            if action == 'join_game':
                 game.mouse_user = request.user
                 game.save()
-            if fromUrl == 'replay_game':
+            if action == 'replay_game':
                 request.session['move_counter'] = -1
 
             return redirect(reverse('show_game'))
+    else:
+        print('Hello', action, "join_game", action=="join_game")
+        if action == 'join_game':
+            return join_game(request)
+        elif action == 'play_game':
+            return play_game(request)
+        elif action == 'replay_game':
+            return replay_game(request)
 
-    return HttpResponse('Selected game does not exist.', status=404)
+    return HttpResponse('This action is not registered', status=404)
 
 
 @login_required

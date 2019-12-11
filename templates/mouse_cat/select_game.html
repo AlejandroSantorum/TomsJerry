@@ -1,13 +1,36 @@
 {% extends "mouse_cat/game_base.html" %}
+{% load staticfiles %}
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="{% static 'js/pagination.js' %}"></script>
+{% endblock %}
 
 {% block content %}
-
+<div id="select-header" class="d-flex flex-column align-items-center">
 <span class="display-4 text-white font-weight-bold">Select a game</span>
 
-{% for g in games %}
-<div class="col-9" style="max-height: fit-content;">
+<div class="filter-card">
+    <div>
+        <input type="checkbox" id="cat-filter" name="cat-filter" checked></input>
+        <label for="cat-filter">Cat games</label>
+    </div>
+    <div>
+        <input type="checkbox" id="mouse-filter" name="mouse-filter" checked></input>
+        <label for="mouse-filter">Mouse games</label>
+    </div>
+</div>
 
-    <a href="{% url 'select_game' g.id %}" class="game-card bg-white form-rounded d-flex flex-row m-3 justify-content-center shadow">
+</div>
+
+{% for g in games %}
+<div class="col-9 game-aref" style="max-height: fit-content;">
+
+    {% if g.cat_user == request.user %}
+    <a href="{% url 'select_game' action g.id %}" class="card-cat-game game-card bg-white form-rounded d-flex flex-row m-3 justify-content-center shadow">
+    {% else %}
+    <a href="{% url 'select_game' action g.id %}" class="card-mouse-game game-card bg-white form-rounded d-flex flex-row m-3 justify-content-center shadow">
+    {% endif %}
         <div class="col-3 d-flex flex-column justify-content-center align-items-center">
             <img class="card-img" src="https://i.kym-cdn.com/photos/images/original/001/505/718/136.jpg" alt="">
             <span class="text-center card-text"> {{g.cat_user}} </span>

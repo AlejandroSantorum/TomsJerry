@@ -1,8 +1,6 @@
 $( function () {
     var next=true, prev=false, pause=true, interval_id;
 
-
-
     function nextMove(csfrVal) {
         csfrVal = $('[name=csrfmiddlewaretoken]').attr('value');
         if (next){
@@ -23,10 +21,12 @@ $( function () {
                     token = $('#cell_'+og).children()[0];
                     $('#cell_'+og).children().remove();
                     $('#cell_'+tg).html(token);
+                    $('[name=next]').attr('disabled', !next);
+                    $('[name=prev]').attr('disabled', !prev);
                 }
             });
         } else {
-            pause = !pause;
+            pause = true;
             $('[name=play-pause]').html("▶️");
             clearInterval(interval_id);
             alert($('#game-finished').attr('value') + ' won the game!');
@@ -60,6 +60,8 @@ $( function () {
                         token = $('#cell_'+og).children()[0];
                         $('#cell_'+og).children().remove();
                         $('#cell_'+tg).html(token);
+                        $('[name=next]').attr('disabled', !next);
+                        $('[name=prev]').attr('disabled', !prev);
                     }
                 });
             }
