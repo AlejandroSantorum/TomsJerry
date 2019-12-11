@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     {% block extra_css %}
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        rel="stylesheet">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css" integrity="sha384-SI27wrMjH3ZZ89r4o+fGIJtnzkAnFs3E4qz9DIYioCQ5l9Rd/7UAa8DHcaL8jkWt" crossorigin="anonymous">
         <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}"/>
     {% endblock extra_css %}
@@ -15,13 +17,13 @@
     {% block extra_head %}
 
     {% endblock extra_head %}
-    <title>{% block title %}PSI 2019-2020: Example of application{% endblock %}</title>
+    <title>{% block title %}Toms & Jerry{% endblock %}</title>
 </head>
 
 <body class="bg-dark d-flex flex-column">
-    <div class="row justify-content-center">
+    <a href="{% url 'index' %}" class="row justify-content-center">
         <div id="title" class="col-8 font-weight-bold display-1 text-center text-white">Toms & Jerry</div>
-    </div>
+    </a>
 
     <div id="content" class="container align-items-center d-flex flex-column flex-grow-1">
         {% block content %}

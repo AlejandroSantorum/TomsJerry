@@ -1,9 +1,6 @@
 {% extends "mouse_cat/base.html" %}
 
 {% block content %}
-<div id="content">
-    <h1>Error</h1>
-    <p class="error">{{ msg_error }}</p>
-    <p><a href="{% url 'landing' %}">Return to homepage</a></p>
-</div>
+    <span class="display-3 text-white mt-3">Error</span>
+    <span class="display-3 text-white mt-3">{{msg_error}}</span>
 {% endblock content %}

@@ -1,8 +1,6 @@
 {% extends "mouse_cat/base.html" %}
 
 {% block content %}
-
-
     {% if user_form %}
     <form id="user_form" method="post" action="{% url 'signup' %}" class="align-items-center mt-4 d-flex flex-column bg-white form-rounded col-10 col-md-8 shadow p-5">
         {% csrf_token %}
@@ -16,12 +14,17 @@
             <div class="col-4 col-sm-6 col-md-7 col-lg-8">
                  {{ field }}
             </div>
+            {% for err in field.errors %}
+                <span class="field-error col-10">
+                    {{ err }}
+                </span>
+            {% endfor %}
         </div>
         {% endfor %}
         <input type="hidden" name="return_service" value="{{ return_service }}" />
         <input type="submit" class="btn btn-info mt-4" value="Register" />
     </form>
     {% else %}
-    <span class="display-4 text-white">User successfully created</span>
+        <span class="display-4 text-white mt-3">User successfully created</span>
     {% endif %}
 {% endblock content %}

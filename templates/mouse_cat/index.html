@@ -6,7 +6,8 @@
     {% if user.is_authenticated %}
     <div>
         <span class="text-white">Welcome {{ request.user.username }}!</span>
-        <a class="col-6 font-weight-bold" href="{% url 'logout' %}">Log Out</a>
+        <a class="col-6 font-weight-bold" href="{% url 'logout' %}"><i class="material-icons text-white">exit_to_app</i>
+        </a>
     </div>
     <div class="flex-grow-1"></div>
     <div class="row justify-content-center w-100">

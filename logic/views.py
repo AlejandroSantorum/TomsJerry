@@ -8,6 +8,8 @@ from logic.forms import UserForm, SignupForm, MoveForm
 from datamodel import constants
 from datamodel.models import Counter, Game, GameStatus, Move
 from django.db.models import Q
+from ratonGato import settings
+
 import json
 
 def anonymous_required(f):
@@ -30,6 +32,7 @@ def anonymous_required(f):
     """
     def wrapped(request):
         if request.user.is_authenticated:
+            counter_inc(request)
             return HttpResponseForbidden(
                 errorHTTP(request,
                           exception="Action restricted to anonymous users"))
@@ -37,6 +40,32 @@ def anonymous_required(f):
             return f(request)
     return wrapped
 
+
+def my_login_required(f):
+    """
+    my_login_required (main author: Rafael Sanchez)
+    ----------
+    Input parameters:
+        f: decorated function
+    ----------
+    Returns:
+        function wrapped
+    ----------
+    Raises:
+        None
+    ----------
+    Description:
+        Decorator definition. It  implements a filterthat redirects to a error
+        page in case the function that it 'decorates' is invoked by an anonymous
+        authenticated user.
+    """
+    def wrapped(request):
+        if not request.user.is_authenticated:
+            counter_inc(request)
+            return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+        else:
+            return f(request)
+    return wrapped
 
 def errorHTTP(request, exception=None):
     """
@@ -152,7 +181,7 @@ def user_logout(request):
     request.session.pop(constants.COUNTER_SESSION_ID, None)
     request.session.pop(constants.GAME_SELECTED_SESSION_ID, None)
     logout(request)
-    return render(request, "mouse_cat/logout.html", context_dict)
+    return redirect(reverse('index'))
 
 
 @anonymous_required
@@ -217,6 +246,16 @@ def signup(request):
     context_dict = {'user_form': SignupForm()}
     return render(request, "mouse_cat/signup.html", context_dict)
 
+def counter_inc(request):
+    Counter.objects.inc()
+    counter_global = Counter.objects.get_current_value()
+
+    if not request.session.get(constants.COUNTER_SESSION_ID):
+        request.session[constants.COUNTER_SESSION_ID] = 1
+        counter_session = 1
+    else:
+        request.session[constants.COUNTER_SESSION_ID] += 1
+        counter_session = request.session[constants.COUNTER_SESSION_ID]
 
 def counter(request):
     """
@@ -234,22 +273,19 @@ def counter(request):
     Description:
             It updates and shows several counters of the received requests
     """
-    Counter.objects.inc()
-    counter_global = Counter.objects.get_current_value()
 
-    if not request.session.get(constants.COUNTER_SESSION_ID):
-        request.session[constants.COUNTER_SESSION_ID] = 1
-        counter_session = 1
-    else:
-        request.session[constants.COUNTER_SESSION_ID] += 1
+    counter_global = Counter.objects.get_current_value()
+    if request.session.get(constants.COUNTER_SESSION_ID):
         counter_session = request.session[constants.COUNTER_SESSION_ID]
+    else:
+        counter_session = request.session[constants.COUNTER_SESSION_ID] = 0
 
     context_dict = {'counter_session': counter_session,
                     'counter_global': counter_global}
     return render(request, "mouse_cat/counter.html", context_dict)
 
 
-@login_required
+@my_login_required
 def create_game(request):
     """
     create_game (main author: Rafael Sanchez)
@@ -272,7 +308,7 @@ def create_game(request):
     return render(request, "mouse_cat/new_game.html", {'game': game})
 
 
-@login_required
+@my_login_required
 def join_game(request):
     """
     join_game (main author: Rafael Sanchez)
@@ -294,15 +330,15 @@ def join_game(request):
     pending_games = pending_games.exclude(cat_user=request.user)
     pending_games = pending_games.order_by('-id')
     if len(pending_games) == 0:
-        context_dict = {constants.ERROR_MESSAGE_ID:
-                        'There is no available games'}
-        return render(request, "mouse_cat/join_game.html", context_dict) # TODO: Decidir que hacer
+        context_dict = {}
+        context_dict[constants.ERROR_MESSAGE_ID] = "There are no games to join"
+        return render(request, "mouse_cat/error.html", context_dict)
 
     request.session['from'] = 'join_game'
     return render(request, "mouse_cat/select_game.html", {'games': pending_games, 'action': 'join_game'})
 
 
-@login_required
+@my_login_required
 def play_game(request):
     """
     play_game (main author: Rafael Sanchez)
@@ -324,15 +360,15 @@ def play_game(request):
                                    Q(mouse_user=request.user))
     my_games = list(my_games.filter(status=GameStatus.ACTIVE))
     if len(my_games) == 0:
-        context_dict = {constants.ERROR_MESSAGE_ID:
-                        'There is no available games'}
-        return render(request, "mouse_cat/join_game.html", context_dict) #TODO: decide
+        context_dict = {}
+        context_dict[constants.ERROR_MESSAGE_ID] = "There are no games to play"
+        return render(request, "mouse_cat/error.html", context_dict)
 
     request.session['from'] = 'play_game'
     return render(request, "mouse_cat/select_game.html", {'games': my_games, 'action': 'play_game'})
 
 
-@login_required
+@my_login_required
 def replay_game(request):
     """
     play_game (main author: Rafael Sanchez)
@@ -354,15 +390,15 @@ def replay_game(request):
                                    Q(mouse_user=request.user))
     my_games = list(my_games.filter(status=GameStatus.FINISHED))
     if len(my_games) == 0:
-        context_dict = {constants.ERROR_MESSAGE_ID:
-                        'There is no available games'}
-        return render(request, "mouse_cat/join_game.html", context_dict) #TODO: decide
+        context_dict = {}
+        context_dict[constants.ERROR_MESSAGE_ID] = "There are no games to replay"
+        return render(request, "mouse_cat/error.html", context_dict)
 
     request.session['from'] = 'replay_game'
     return render(request, "mouse_cat/select_game.html", {'games': my_games, 'action': 'replay_game'})
 
 
-@login_required
+@my_login_required
 def select_game(request, action, game_id=None):
     """
     select_game (main author: Alejandro Santorum)
@@ -404,7 +440,6 @@ def select_game(request, action, game_id=None):
 
             return redirect(reverse('show_game'))
     else:
-        print('Hello', action, "join_game", action=="join_game")
         if action == 'join_game':
             return join_game(request)
         elif action == 'play_game':
@@ -415,7 +450,7 @@ def select_game(request, action, game_id=None):
     return HttpResponse('This action is not registered', status=404)
 
 
-@login_required
+@my_login_required
 def show_game(request):
     """
     show_game (main author: Rafael Sanchez)
@@ -460,7 +495,7 @@ def show_game(request):
     return render(request, "mouse_cat/game.html", context_dict)
 
 
-@login_required
+@my_login_required
 def move(request):
     """
     move (main author: Alejandro Santorum)
@@ -518,14 +553,17 @@ def get_move(request):
     shift = int(request.POST.get('shift'))
     game_id = request.session.get(constants.GAME_SELECTED_SESSION_ID)
     game = Game.objects.get(id=game_id)
-    move_idx = int(request.session.get('move_counter'))
+
+    if request.session.get('move_counter') is not None:
+        move_idx = int(request.session.get('move_counter'))
+    else:
+        request.session['move_counter'] = move_idx = -1
 
     n_moves = len(game.moves)
     if shift > 0:
         move_idx += shift
         move = game.moves[move_idx]
         request.session['move_counter'] = move_idx
-        print(n_moves, move_idx)
         resp = {'origin': move.origin, 'target': move.target, 'previous': True, 'next': move_idx < n_moves - 1}
     else:
         move = game.moves[move_idx]

@@ -44,13 +44,13 @@ body{
 }
 
 a {
-    color: inherit;
-    text-decoration: inherit;
+    color: inherit !important;
+    text-decoration: none !important;
 }
 
 a:hover{
-    color: inherit;
-    text-decoration: inherit;
+    color: inherit !important;
+    text-decoration: none !important;
 }
 
 .game-card {
@@ -116,4 +116,8 @@ tr:nth-of-type(2n) > td:nth-of-type(2n), tr:nth-of-type(2n+1) > td:nth-of-type(2
 
 .filter-card > div > input {
     margin-right: 4px;
+}
+
+.field-error {
+    color: rgb(200, 80, 20);
 }

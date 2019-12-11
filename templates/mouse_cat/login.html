@@ -13,6 +13,13 @@
             <div class="col-4 col-sm-6 col-md-7 col-lg-8">
                  {{ field }}
             </div>
+            {% for err in field.errors %}
+                {% for inner_err in err %}
+                <span class="field-error col-10">
+                    {{ inner_err }}
+                </span>
+                {% endfor %}
+            {% endfor %}
         </div>
         {% endfor %}
         <input type="hidden" name="return_service" value="{{ return_service }}" />

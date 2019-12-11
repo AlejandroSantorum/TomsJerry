@@ -9,8 +9,6 @@
 {% block content %}
 
 <div id="select-header" class="d-flex flex-column align-items-center w-100">
-    <span class="display-4 text-white font-weight-bold">Select a game</span>
-
     <div class="d-flex flex-row align-items-end" style="width: calc(calc(100%/12)*8); justify-content: space-between;">
         <div class="filter-card">
             <div>
@@ -22,7 +20,7 @@
                 <label for="mouse-filter">Mouse games</label>
             </div>
         </div>
-
+        <span class="text-white font-weight-bold" style="font-size: xx-large;">Select a game</span>
         <div class="flex-row d-flex">
             <button class="btn btn-light ml-2 mr-2" type="button" name="prev" disabled>⏪</button>
             <div class="btn btn-light ml-2 mr-2" style="cursor: inherit;" id="page-number">1</div>
@@ -44,6 +42,7 @@
             <span class="text-center card-text"> {{g.cat_user}} </span>
         </div>
         <div class="col text-center d-flex flex-column justify-content-center align-items-center">
+            <span class="turn-font font-weight-bold"> Game: {{g.id}} </span>
             <span class="vs-font font-weight-bold"> VS </span>
             {% if g.cat_turn %}
             <span class="turn-font font-weight-bold"> {{g.cat_user}}'s turn </span>

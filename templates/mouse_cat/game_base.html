@@ -15,7 +15,7 @@
     {% block extra_head %}
 
     {% endblock extra_head %}
-    <title>{% block title %}PSI 2019-2020: Example of application{% endblock %}</title>
+    <title>{% block title %}Toms & Jerry{% endblock %}</title>
 </head>
 
 <body class="bg-dark d-flex flex-column">
@@ -45,6 +45,9 @@
                 <div class="flex-grow-1"></div>
             </div>
             <div class="col-10 d-flex flex-column align-items-center" id='content-div' style="margin-left: auto;">
+                <a href="{% url 'index' %}" class="row justify-content-center">
+                    <div id="title" class="col-12 font-weight-bold display-3 text-center text-white">Toms & Jerry</div>
+                </a>
                 {% block content %}
                 {% endblock content %}
             </div>
