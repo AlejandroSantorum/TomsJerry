@@ -2,12 +2,12 @@ $( function() {
     var reload_id;
 
     function reload() {
-        console.log('reloading');
+
         $('#turn-info').load('/mouse_cat/show_game #turn-info', function () {
             $('#chess_board').load('/mouse_cat/show_game #chess_board', function () {
                 user = $('#draggable').html()
                 if (user) {
-                    console.log(user);
+
                     $("[id^="+user+"-drag]").draggable(
                             {
                                 revert: "invalid",
@@ -16,10 +16,10 @@ $( function() {
                             }
                         );
                     clearTimeout(reload_id);
-                    console.log(reload_id+': Cleared');
+
                 } else {
                     reload_id = setTimeout(reload, 1000);
-                    console.log(reload_id+': Setted');
+
                 }
             });
         });
@@ -63,7 +63,7 @@ $( function() {
                 },
             complete: function () {
                 reload();
-                console.log('EXECUTING GET');
+
                 $.ajax({
                     type: 'GET',
                     url: "/mouse_cat/game_status",
@@ -107,7 +107,7 @@ $( function() {
     function removeDrop(event, ui){
         $(".light-cell").each(
             function () {
-                console.log(this);
+
                 $(this).removeClass('light-cell');
                 $(this).droppable('destroy');
             }
@@ -119,7 +119,7 @@ $( function() {
     // INITIALIZATIONS
     user = $('#draggable').html()
     if (user) {
-        console.log(user);
+
         $("[id^="+user+"-drag]").draggable(
                 {
                     revert: "invalid",

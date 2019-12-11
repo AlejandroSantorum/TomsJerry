@@ -16,8 +16,8 @@ $( function () {
                     tg = result.target;
                     next = result.next;
                     prev = result.previous
-                    console.log(result);
-                    console.log(og, tg, next, prev);
+
+
                     token = $('#cell_'+og).children()[0];
                     $('#cell_'+og).children().remove();
                     $('#cell_'+tg).html(token);
@@ -55,8 +55,8 @@ $( function () {
                         tg = result.target;
                         next = result.next;
                         prev = result.previous;
-                        console.log(result);
-                        console.log(og, tg, next, prev);
+
+
                         token = $('#cell_'+og).children()[0];
                         $('#cell_'+og).children().remove();
                         $('#cell_'+tg).html(token);
