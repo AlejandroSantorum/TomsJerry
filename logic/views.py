@@ -565,13 +565,13 @@ def get_move(request):
         move_idx += shift
         move = move_list[move_idx]
         request.session['move_counter'] = move_idx
-        resp = {'origin': move.origin, 'target': move.target, 'previous': True, 'next': move_idx < n_moves - 1, 'move_counter': request.session['move_counter'], 'all_moves': str(move_list), 'm0': str(move_list[0]), 'm1': str(move_list[1]), 'm2': str(move_list[2])}
+        resp = {'origin': move.origin, 'target': move.target, 'previous': True, 'next': move_idx < n_moves - 1}
     else:
         move = move_list[move_idx]
         old_idx = move_idx
         move_idx += shift
         request.session['move_counter'] = move_idx
-        resp = {'origin': move.target, 'target': move.origin, 'previous': move_idx >= 0, 'next': True, 'move_counter': request.session['move_counter'], 'all_moves': str(move_list), 'this_move': str(move_list[old_idx]), 'old_idx': old_idx, 'new_idx': move_idx}
+        resp = {'origin': move.target, 'target': move.origin, 'previous': move_idx >= 0, 'next': True}
 
     return JsonResponse(resp, status=200)
 
