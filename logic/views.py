@@ -554,7 +554,7 @@ def get_move(request):
     # POST
     if not request.session.get(constants.GAME_SELECTED_SESSION_ID):
         counter_inc(request)
-        return HttpResponse('Invalid method.', status=404)
+        return HttpResponse('No game selected.', status=404)
     shift = int(request.POST.get('shift'))
     game_id = request.session.get(constants.GAME_SELECTED_SESSION_ID)
     game = Game.objects.get(id=game_id)
@@ -585,4 +585,8 @@ def game_status(request):
     if request.session.get(constants.GAME_SELECTED_SESSION_ID):
         game_id = request.session.get(constants.GAME_SELECTED_SESSION_ID)
         game = Game.objects.get(id=game_id)
-        return  JsonResponse({'status': game.status, 'winner': game.winner.username}, status=200)
+        if game.winner:
+            winner = game.winner.username
+        else:
+            winner = None
+        return  JsonResponse({'status': game.status, 'winner': winner}, status=200)
