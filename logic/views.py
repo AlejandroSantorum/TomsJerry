@@ -564,7 +564,7 @@ def get_move(request):
         move_idx += shift
         move = game.moves[move_idx]
         request.session['move_counter'] = move_idx
-        resp = {'origin': move.origin, 'target': move.target, 'previous': True, 'next': move_idx < n_moves - 1, 'move_counter': request.session['move_counter'], 'all_moves': str(game.moves), 'this_move': str(game.moves[move_idx]), 'old_idx': old_idx, 'new_idx': move_idx}
+        resp = {'origin': move.origin, 'target': move.target, 'previous': True, 'next': move_idx < n_moves - 1, 'move_counter': request.session['move_counter'], 'all_moves': str(game.moves), 'm0': str(game.moves)[0], 'm1': str(game.moves[1]), 'm2': str(game.moves[2])}
     else:
         move = game.moves[move_idx]
         old_idx = move_idx
