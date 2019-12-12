@@ -44,13 +44,13 @@ body{
 }
 
 a {
-    color: inherit !important;
-    text-decoration: none !important;
+    color: inherit;
+    text-decoration: inherit;
 }
 
 a:hover{
-    color: inherit !important;
-    text-decoration: none !important;
+    color: inherit;
+    text-decoration: inherit;
 }
 
 .game-card {
