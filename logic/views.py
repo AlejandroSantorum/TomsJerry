@@ -560,15 +560,17 @@ def get_move(request):
 
     n_moves = len(game.moves)
     if shift > 0:
+        old_idx = move_idx
         move_idx += shift
         move = game.moves[move_idx]
         request.session['move_counter'] = move_idx
-        resp = {'origin': move.origin, 'target': move.target, 'previous': True, 'next': move_idx < n_moves - 1, 'move_counter': request.session['move_counter'], 'all_moves': str(game.moves), 'this_move': str(move)}
+        resp = {'origin': move.origin, 'target': move.target, 'previous': True, 'next': move_idx < n_moves - 1, 'move_counter': request.session['move_counter'], 'all_moves': str(game.moves), 'this_move': str(game.moves[move_idx]), 'old_idx': old_idx, 'new_idx': move_idx}
     else:
         move = game.moves[move_idx]
+        old_idx = move_idx
         move_idx += shift
         request.session['move_counter'] = move_idx
-        resp = {'origin': move.target, 'target': move.origin, 'previous': move_idx >= 0, 'next': True, 'move_counter': request.session['move_counter'], 'all_moves': str(game.moves), 'this_move': str(move)}
+        resp = {'origin': move.target, 'target': move.origin, 'previous': move_idx >= 0, 'next': True, 'move_counter': request.session['move_counter'], 'all_moves': str(game.moves), 'this_move': str(game.moves[move_idx]), 'old_idx': old_idx, 'new_idx': move_idx}
 
     return JsonResponse(resp, status=200)
 
