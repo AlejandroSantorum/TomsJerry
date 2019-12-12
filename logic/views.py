@@ -1,7 +1,6 @@
 from django.http import HttpResponseForbidden, HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from logic.forms import UserForm, SignupForm, MoveForm
@@ -10,7 +9,6 @@ from datamodel.models import Counter, Game, GameStatus, Move
 from django.db.models import Q
 from ratonGato import settings
 
-import json
 
 def anonymous_required(f):
     """
@@ -55,8 +53,8 @@ def my_login_required(f):
         None
     ----------
     Description:
-        Decorator definition. It  implements a filterthat redirects to a error
-        page in case the function that it 'decorates' is invoked by an anonymous
+        Decorator definition. It implements a filter that redirects to a error
+        page in case the function that it 'decorates' is invoked by an
         authenticated user.
     """
     def wrapped(request, *args, **kwargs):
@@ -66,6 +64,7 @@ def my_login_required(f):
         else:
             return f(request, *args, **kwargs)
     return wrapped
+
 
 def errorHTTP(request, exception=None):
     """
@@ -124,12 +123,12 @@ def user_login(request):
         None
     ----------
     Description:
-            Case method 'POST': It renders "mouse_cat/index.html" template in
+        Case method 'POST': It renders "mouse_cat/index.html" template in
             case the user is logged successfully. Otherwise it renders
-        "mouse_cat/login.html" again.
-            Case method 'GET': It renders "mouse_cat/login.html" with the user
-        form data.
-            It both cases the user is required to be anonymous, i.e, not logged
+            "mouse_cat/login.html" again.
+        Case method 'GET': It renders "mouse_cat/login.html" with the user
+            form data.
+            In both cases the user is required to be anonymous, i.e, not logged
     """
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -177,7 +176,6 @@ def user_logout(request):
     if not request.user.is_authenticated:
         return redirect(reverse('index'))
 
-    context_dict = {'user': request.user.username}
     request.session.pop(constants.COUNTER_SESSION_ID, None)
     request.session.pop(constants.GAME_SELECTED_SESSION_ID, None)
     logout(request)
@@ -229,14 +227,12 @@ def signup(request):
             validate_password(cd['password'])
         except ValidationError as err:
             user_form.errors['password'] = err.messages
-            # user_form.add_error('password', ' '.join(err.messages))
             return render(
                           request,
                           "mouse_cat/signup.html",
                           {'user_form': user_form}
                          )
 
-        # try:
         user = user_form.save()
         user.set_password(user.password)
         user.save()
@@ -246,16 +242,31 @@ def signup(request):
     context_dict = {'user_form': SignupForm()}
     return render(request, "mouse_cat/signup.html", context_dict)
 
+
 def counter_inc(request):
+    """
+    counter_inc (main author: Rafael Sanchez)
+    ----------
+    Input parameters:
+        request: received request. In its body receives nothing.
+    ----------
+    Returns:
+        None
+    ----------
+    Raises:
+        None
+    ----------
+    Description:
+            Increase global and session counter whenever this function is
+            invoked
+    """
     Counter.objects.inc()
-    counter_global = Counter.objects.get_current_value()
 
     if not request.session.get(constants.COUNTER_SESSION_ID):
         request.session[constants.COUNTER_SESSION_ID] = 1
-        counter_session = 1
     else:
         request.session[constants.COUNTER_SESSION_ID] += 1
-        counter_session = request.session[constants.COUNTER_SESSION_ID]
+
 
 def counter(request):
     """
@@ -271,7 +282,7 @@ def counter(request):
         None
     ----------
     Description:
-            It updates and shows several counters of the received requests
+            It shows several counters of the received requests
     """
 
     counter_global = Counter.objects.get_current_value()
@@ -317,14 +328,13 @@ def join_game(request):
         request: received request. It contains logged user information.
     ----------
     Returns:
-        It renders "mouse_cat/join_game.html" template
+        It renders "mouse_cat/select_game.html" template
     ----------
     Raises:
         None
     ----------
     Description:
-        The selected game is activated and it's the player 1 turn.
-        It both cases the user is required to be logged.
+        It filters and renders the games available to join.
     """
     pending_games = Game.objects.filter(mouse_user=None)
     pending_games = pending_games.exclude(cat_user=request.user)
@@ -335,7 +345,8 @@ def join_game(request):
         return render(request, "mouse_cat/error.html", context_dict)
 
     request.session['from'] = 'join_game'
-    return render(request, "mouse_cat/select_game.html", {'games': pending_games, 'action': 'join_game'})
+    return render(request, "mouse_cat/select_game.html",
+                  {'games': pending_games, 'action': 'join_game'})
 
 
 @my_login_required
@@ -347,14 +358,13 @@ def play_game(request):
         request: received request. It contains logged user information.
     ----------
     Returns:
-        It renders "mouse_cat/join_game.html" template
+        It renders "mouse_cat/select_game.html" template
     ----------
     Raises:
         None
     ----------
     Description:
-        The selected game is activated and it's the player 1 turn.
-        It both cases the user is required to be logged.
+        It filters and renders the games available to play.
     """
     my_games = Game.objects.filter(Q(cat_user=request.user) |
                                    Q(mouse_user=request.user))
@@ -365,7 +375,8 @@ def play_game(request):
         return render(request, "mouse_cat/error.html", context_dict)
 
     request.session['from'] = 'play_game'
-    return render(request, "mouse_cat/select_game.html", {'games': my_games, 'action': 'play_game'})
+    return render(request, "mouse_cat/select_game.html",
+                  {'games': my_games, 'action': 'play_game'})
 
 
 @my_login_required
@@ -377,25 +388,25 @@ def replay_game(request):
         request: received request. It contains logged user information.
     ----------
     Returns:
-        It renders "mouse_cat/join_game.html" template
+        It renders "mouse_cat/select_game.html" template
     ----------
     Raises:
         None
     ----------
     Description:
-        The selected game is activated and it's the player 1 turn.
-        It both cases the user is required to be logged.
+        It filters and renders the games available to replay.
     """
     my_games = Game.objects.filter(Q(cat_user=request.user) |
                                    Q(mouse_user=request.user))
     my_games = list(my_games.filter(status=GameStatus.FINISHED))
     if len(my_games) == 0:
         context_dict = {}
-        context_dict[constants.ERROR_MESSAGE_ID] = "There are no games to replay"
+        context_dict[constants.ERROR_MESSAGE_ID] = "No games to replay"
         return render(request, "mouse_cat/error.html", context_dict)
 
     request.session['from'] = 'replay_game'
-    return render(request, "mouse_cat/select_game.html", {'games': my_games, 'action': 'replay_game'})
+    return render(request, "mouse_cat/select_game.html",
+                  {'games': my_games, 'action': 'replay_game'})
 
 
 @my_login_required
@@ -404,12 +415,12 @@ def select_game(request, action, game_id=None):
     select_game (main author: Alejandro Santorum)
     ----------
     Input parameters:
-        method 'GET': received request. It contains logged user information.
-        method 'POST': received request and the game ID to be played.
+        method 'GET': received request and action (join, play, replay).
+                      It contains logged user information.
+        method 'POST': received request action and the game ID.
     ----------
     Returns:
-        It renders "mouse_cat/select_game.html" template
-        "mouse_cat/show_game.html"
+        It renders "mouse_cat/select_game.html" through modularized functions
     ----------
     Raises:
         None
@@ -463,15 +474,15 @@ def show_game(request):
     ----------
     Returns:
             It renders "mouse_cat/game.html" template or
-        "mouse_cat/select_game.html" template if there is no selected game
+        "index" template if there is no selected game
     ----------
     Raises:
         None
     ----------
     Description:
-            It shows the selected game data, including the game board,
-        represented as an integer array [0,63]. Cats are represented with
-        value 1 and mouse with value -1.
+            It shows the selected game data and board. If the game is
+            being replayed then some media control buttons are also
+            rendered.
             User is required to be logged.
     """
     if not request.session.get(constants.GAME_SELECTED_SESSION_ID):
@@ -545,9 +556,30 @@ def move(request):
         return render(request, "mouse_cat/game.html", context_dict)
     return redirect(reverse('show_game'))
 
-# TODO: Document this
 
+@my_login_required
 def get_move(request):
+    """
+    move (main author: Rafael Sanchez)
+    ----------
+    Input parameters:
+        request: received request. It contains the shift value to select
+                 which move to return
+    ----------
+    Returns:
+        A response containing a json with fields:
+            origin
+            target
+            previous
+            next
+    ----------
+    Raises:
+        None
+    ----------
+    Description:
+        Provides an endpoint to help replay games. It returns the movement a
+        game token have done in a precise moment to re-render it in the client
+    """
     if request.method == 'GET':
         counter_inc(request)
         return HttpResponse('Invalid method.', status=404)
@@ -567,21 +599,42 @@ def get_move(request):
     move_list = list(game.moves)
     n_moves = len(move_list)
     if shift > 0:
-        old_idx = move_idx
         move_idx += shift
         move = move_list[move_idx]
         request.session['move_counter'] = move_idx
-        resp = {'origin': move.origin, 'target': move.target, 'previous': True, 'next': move_idx < n_moves - 1}
+        resp = {'origin': move.origin, 'target': move.target, 'previous': True,
+                'next': move_idx < n_moves - 1}
     else:
         move = move_list[move_idx]
-        old_idx = move_idx
         move_idx += shift
         request.session['move_counter'] = move_idx
-        resp = {'origin': move.target, 'target': move.origin, 'previous': move_idx >= 0, 'next': True}
+        resp = {'origin': move.target, 'target': move.origin,
+                'previous': move_idx >= 0, 'next': True}
 
     return JsonResponse(resp, status=200)
 
+
+@my_login_required
 def game_status(request):
+    """
+    move (main author: Alejandro Santorum)
+    ----------
+    Input parameters:
+        request: received request. It cointains the logged user
+    ----------
+    Returns:
+        A response containing a json with fields:
+            status
+            winner
+    ----------
+    Raises:
+        None
+    ----------
+    Description:
+        Provides an endpoint to get game info from the client. The JSON
+        will contain the status of the selected game and the winner of it
+        (if any)
+    """
     if request.session.get(constants.GAME_SELECTED_SESSION_ID):
         game_id = request.session.get(constants.GAME_SELECTED_SESSION_ID)
         game = Game.objects.get(id=game_id)
@@ -589,4 +642,6 @@ def game_status(request):
             winner = game.winner.username
         else:
             winner = None
-        return  JsonResponse({'status': game.status, 'winner': winner}, status=200)
+        return JsonResponse({'status': game.status, 'winner': winner},
+                            status=200)
+    return HttpResponse('Selected game does not exist', status=404)

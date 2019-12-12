@@ -15,7 +15,8 @@ urlpatterns = [
     path('get_move', views.get_move, name='get_move'),
     path('game_status', views.game_status, name='game_status'),
     path('select_game/<str:action>', views.select_game, name='select_game'),
-    path('select_game/<str:action>/<int:game_id>', views.select_game, name='select_game'),
+    path('select_game/<str:action>/<int:game_id>',
+         views.select_game, name='select_game'),
     path('show_game', views.show_game, name='show_game'),
     path('move', views.move, name='move'),
 ]

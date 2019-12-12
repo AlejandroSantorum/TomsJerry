@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
-import datetime
 
 
 MSG_ERROR_INVALID_CELL = "Invalid cell for a cat or the mouse|" +\
@@ -66,7 +65,7 @@ class Game(models.Model):
     status = models.IntegerField(default=GameStatus.CREATED)
     # Game winner (if any)
     winner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True,
-                                   null=True, related_name="game_winner")
+                               null=True, related_name="game_winner")
 
     # Game moves
     @property
@@ -132,7 +131,9 @@ class Game(models.Model):
         possible_moves = set([SE_lst, SW_lst, NW_lst, NE_lst])
         cats = set(cats)
         possible_moves = possible_moves.difference(cats)
-        possible_moves = [move for move in possible_moves if (move[0] >= 1 and move[0] <= 8 and move[1] >= 1 and move[1] <= 8)]
+        possible_moves = [move for move in possible_moves if
+                          (move[0] >= 1 and move[0] <= 8 and move[1] >= 1
+                           and move[1] <= 8)]
         if len(possible_moves) == 0:
             self.winner = self.cat_user
             return True
