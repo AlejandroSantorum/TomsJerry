@@ -71,7 +71,7 @@ class Game(models.Model):
     # Game moves
     @property
     def moves(self):
-        return Move.objects.filter(game=self)
+        return Move.objects.filter(game=self).order_by('date')
 
     def __str_game_status(self):
         if self.status == 0:
@@ -182,7 +182,7 @@ class Move(models.Model):
                                           ])
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     player = models.ForeignKey(User, on_delete=models.CASCADE)
-    date = models.DateField(default=datetime.date.today)
+    date = models.DateTimeField(auto_now_add=True)
 
     def __pos_to_list(self, position):
         return [(position//Game.WIDTH) + 1, (position % Game.WIDTH) + 1]
