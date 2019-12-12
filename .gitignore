@@ -129,7 +129,7 @@ dmypy.json
 staticfiles
 uploads
 staticHeroku
-
+mini.sh
 
 
 dbscript.sh
