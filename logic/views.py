@@ -59,12 +59,12 @@ def my_login_required(f):
         page in case the function that it 'decorates' is invoked by an anonymous
         authenticated user.
     """
-    def wrapped(request):
+    def wrapped(request, *args, **kwargs):
         if not request.user.is_authenticated:
             counter_inc(request)
             return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
         else:
-            return f(request)
+            return f(request, *args, **kwargs)
     return wrapped
 
 def errorHTTP(request, exception=None):
@@ -529,7 +529,6 @@ def move(request):
     target = int(request.POST.get('target'))
     move_form = MoveForm(data=request.POST)
     move = Move(origin=origin, target=target, game=game, player=request.user)
-    print(move, game);
     try:
         move.save()
     except ValidationError as err:
