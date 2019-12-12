@@ -18,6 +18,10 @@
         {{ move_form}}
     </form>
 
+    <div class="alert-winner" style="display: none;">
+      <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+      <div id="winner-title"></div>
+    </div>
 
     <div id="turn-info">
         <div id="game-finished" value="{{game.winner}}">{{game.status}}</div>

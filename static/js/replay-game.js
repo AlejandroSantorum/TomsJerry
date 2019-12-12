@@ -23,13 +23,17 @@ $( function () {
                     $('#cell_'+tg).html(token);
                     $('[name=next]').attr('disabled', !next);
                     $('[name=prev]').attr('disabled', !prev);
+                    if (!next) {
+                        $("#winner-title").html($('#game-finished').attr('value') + ' won the game!');
+                        $(".alert-winner").attr('style', false);
+                        $('[name=play-pause]').html("▶️");
+                    }
                 }
             });
         } else {
             pause = true;
             $('[name=play-pause]').html("▶️");
             clearInterval(interval_id);
-            alert($('#game-finished').attr('value') + ' won the game!');
         }
     };
 

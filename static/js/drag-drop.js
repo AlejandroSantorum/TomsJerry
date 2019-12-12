@@ -23,6 +23,17 @@ $( function() {
                 }
             });
         });
+
+        $.ajax({
+            type: 'GET',
+            url: "/mouse_cat/game_status",
+            success: function (result) {
+                if (result.status == 2){
+                    $('#winner-title').html(result.winner + ' won the game!');
+                    $(".alert-winner").attr('style', false);
+                }
+            }
+        });
     };
 
     function targetPos(x, y, inc_x, inc_y) {
@@ -63,16 +74,6 @@ $( function() {
                 },
             complete: function () {
                 reload();
-
-                $.ajax({
-                    type: 'GET',
-                    url: "/mouse_cat/game_status",
-                    success: function (result) {
-                        if (result.status == 2){
-                            alert(result.winner + ' won the game!');
-                        }
-                    }
-                });
             }
             });
     }

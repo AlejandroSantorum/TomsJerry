@@ -428,6 +428,7 @@ def select_game(request, action, game_id=None):
         elif action == 'replay_game':
             status = GameStatus.FINISHED
         else:
+            counter_inc(request)
             return HttpResponse('Selected game does not exist.', status=404)
         game = Game.objects.filter(id=game_id, status=status)
         if len(game):
@@ -447,6 +448,7 @@ def select_game(request, action, game_id=None):
         elif action == 'replay_game':
             return replay_game(request)
 
+    counter_inc(request)
     return HttpResponse('This action is not registered', status=404)
 
 
@@ -518,9 +520,11 @@ def move(request):
         User is required to be logged.
     """
     if request.method == 'GET':
+        counter_inc(request)
         return HttpResponse('Invalid method.', status=404)
     # POST
     if not request.session.get(constants.GAME_SELECTED_SESSION_ID):
+        counter_inc(request)
         return HttpResponse('Invalid method.', status=404)
     game_id = request.session.get(constants.GAME_SELECTED_SESSION_ID)
     game = Game.objects.get(id=game_id)
@@ -545,9 +549,11 @@ def move(request):
 
 def get_move(request):
     if request.method == 'GET':
+        counter_inc(request)
         return HttpResponse('Invalid method.', status=404)
     # POST
     if not request.session.get(constants.GAME_SELECTED_SESSION_ID):
+        counter_inc(request)
         return HttpResponse('Invalid method.', status=404)
     shift = int(request.POST.get('shift'))
     game_id = request.session.get(constants.GAME_SELECTED_SESSION_ID)

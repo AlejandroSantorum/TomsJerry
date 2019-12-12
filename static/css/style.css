@@ -121,3 +121,31 @@ tr:nth-of-type(2n) > td:nth-of-type(2n), tr:nth-of-type(2n+1) > td:nth-of-type(2
 .field-error {
     color: rgb(200, 80, 20);
 }
+
+/* The alert message box */
+.alert-winner {
+    padding: 20px;
+    text-align: center;
+    background-color: rgb(200, 80, 20);
+    color: white;
+    margin-bottom: 15px;
+    margin-top: 15px;
+    width: 70%;
+}
+
+/* The close button */
+.closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* When moving the mouse over the close button */
+.closebtn:hover {
+  color: black;
+}
