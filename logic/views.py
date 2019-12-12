@@ -558,6 +558,8 @@ def get_move(request):
     else:
         request.session['move_counter'] = move_idx = -1
 
+    print('GAMES:')
+    print(game.moves)
     n_moves = len(game.moves)
     if shift > 0:
         move_idx += shift
