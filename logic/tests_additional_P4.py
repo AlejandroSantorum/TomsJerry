@@ -406,3 +406,55 @@ class CounterServiceTests(tests_services.ServiceBaseTest):
             response = self.client2.get(reverse(cs), follow=True)
             n_calls += 1
             self.is_counter_global(response, n_calls)
+
+
+class GameEndTests(tests.BaseModelTest):
+    def setUp(self):
+        super().setUp()
+        self.game = Game.objects.create(cat_user=self.users[0],
+                                        mouse_user=self.users[1],
+                                        status=GameStatus.ACTIVE)
+        self.game.cat1 = 4
+        self.game.cat2 = 9
+        self.game.cat3 = 25
+        self.game.cat4 = 27
+        self.game.mouse = 18
+        self.game.save()
+
+    def test1(self):
+        ''' main author: Rafael Sanchez '''
+        """ The cat makes the mouse unavailable to move """
+        self.game.cat_turn = True
+        self.game.save()
+
+        Move.objects.create(game=self.game, player=self.game.cat_user,
+                            origin=4, target=11)
+
+        self.assertEqual(self.game.status, GameStatus.FINISHED)
+        self.assertEqual(self.game.winner, self.game.cat_user)
+
+    def test2(self):
+        ''' main author: Alejandro Santorum '''
+        """ The mouse escapes """
+        self.game.cat_turn = False
+        self.game.mouse = 11
+        self.game.save()
+
+        Move.objects.create(game=self.game, player=self.game.mouse_user,
+                            origin=11, target=2)
+
+        self.assertEqual(self.game.status, GameStatus.FINISHED)
+        self.assertEqual(self.game.winner, self.game.mouse_user)
+
+    def test3(self):
+        ''' main author: Rafael Sanchez '''
+        """ The cat commits suicide """
+        self.game.cat_turn = True
+        self.game.mouse = 11
+        self.game.save()
+
+        Move.objects.create(game=self.game, player=self.game.cat_user,
+                            origin=4, target=13)
+
+        self.assertEqual(self.game.status, GameStatus.FINISHED)
+        self.assertEqual(self.game.winner, self.game.mouse_user)
